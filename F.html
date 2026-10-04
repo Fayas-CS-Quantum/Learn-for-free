@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>LearnFree — Free education, no noise</title>
+<meta name="description" content="Curated free YouTube courses. Watch inside a clean, distraction-free player." />
+<link rel="preconnect" href="https://i.ytimg.com" />
+
+<style>
+  :root{
+    --bg:#0d1117; --surface:#161b22; --surface-2:#1c2128;
+    --border:#30363d; --text:#e6edf3; --muted:#8b949e;
+    --accent:#3fb950; --accent-2:#58a6ff;
+    --radius:14px; --max:1200px;
+  }
+  [data-theme="light"]{
+    --bg:#ffffff; --surface:#f6f8fa; --surface-2:#eef1f4;
+    --border:#d0d7de; --text:#1f2328; --muted:#656d76;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg); color:var(--text);
+    font-family:system-ui,-apple-system,"Segoe UI",Inter,Roboto,sans-serif;
+    line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:var(--max);margin:0 auto;padding:0 20px}
+
+  header{
+    position:sticky;top:0;z-index:50;
+    background:color-mix(in srgb,var(--bg) 85%,transparent);
+    backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--border);
+  }
+  .nav{display:flex;align-items:center;gap:16px;height:64px}
+  .logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1.15rem}
+  .logo .mark{
+    width:32px;height:32px;border-radius:9px;
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    display:grid;place-items:center;font-size:1rem;color:#0d1117;
+  }
+  .nav-links{display:flex;gap:22px;margin-left:auto;font-size:.92rem;color:var(--muted)}
+  .nav-links a:hover{color:var(--text)}
+  .icon-btn{
+    background:var(--surface);border:1px solid var(--border);color:var(--text);
+    width:38px;height:38px;border-radius:10px;cursor:pointer;font-size:1rem;
+    display:grid;place-items:center;transition:.2s;
+  }
+  .icon-btn:hover{border-color:var(--accent);transform:translateY(-1px)}
+  @media(max-width:720px){.nav-links{display:none}}
+
+  .hero{padding:80px 0 56px;text-align:center;position:relative;overflow:hidden}
+  .hero::before{
+    content:"";position:absolute;inset:-40% 0 auto;height:420px;
+    background:radial-gradient(ellipse at center,color-mix(in srgb,var(--accent) 18%,transparent),transparent 65%);
+    pointer-events:none;
+  }
+  .hero > *{position:relative}
+  .pill{
+    display:inline-flex;align-items:center;gap:8px;
+    background:var(--surface);border:1px solid var(--border);
+    padding:6px 14px;border-radius:999px;font-size:.82rem;color:var(--muted);
+    margin-bottom:22px;
+  }
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);
+       box-shadow:0 0 0 0 var(--accent);animation:pulse 2s infinite}
+  @keyframes pulse{
+    70%{box-shadow:0 0 0 9px transparent}
+    100%{box-shadow:0 0 0 0 transparent}
+  }
+  h1{font-size:clamp(2rem,5.5vw,3.4rem);line-height:1.12;letter-spacing:-.03em;font-weight:800}
+  h1 .grad{
+    background:linear-gradient(100deg,var(--accent),var(--accent-2));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .sub{color:var(--muted);font-size:1.06rem;max-width:560px;margin:18px auto 34px}
+
+  .search{max-width:600px;margin:0 auto;position:relative}
+  .search input{
+    width:100%;padding:16px 52px 16px 50px;
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:var(--radius);color:var(--text);font-size:1rem;
+    outline:none;transition:.2s;
+  }
+  .search input:focus{border-color:var(--accent-2);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent-2) 15%,transparent)}
+  .search .ico{position:absolute;left:18px;top:50%;transform:translateY(-50%);color:var(--muted)}
+  .search kbd{
+    position:absolute;right:14px;top:50%;transform:translateY(-50%);
+    background:var(--surface-2);border:1px solid var(--border);
+    border-radius:6px;padding:3px 8px;font-size:.72rem;color:var(--muted);
+    font-family:ui-monospace,monospace;
+  }
+
+  .stats{display:flex;justify-content:center;gap:44px;margin-top:44px;flex-wrap:wrap}
+  .stat b{display:block;font-size:1.6rem;font-weight:800;letter-spacing:-.02em}
+  .stat span{font-size:.82rem;color:var(--muted)}
+
+  section{padding:56px 0}
+  .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:26px;flex-wrap:wrap}
+  .sec-head h2{font-size:1.5rem;letter-spacing:-.02em}
+  .sec-head p{color:var(--muted);font-size:.9rem}
+
+  .chips{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:30px}
+  .chip{
+    background:var(--surface);border:1px solid var(--border);color:var(--muted);
+    padding:8px 16px;border-radius:999px;font-size:.86rem;cursor:pointer;transition:.18s;
+  }
+  .chip:hover{color:var(--text);border-color:var(--muted)}
+  .chip.active{background:var(--accent);border-color:var(--accent);color:#0d1117;font-weight:600}
+
+  .grid{display:grid;gap:22px;grid-template-columns:repeat(auto-fill,minmax(290px,1fr))}
+  .card{
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:var(--radius);overflow:hidden;cursor:pointer;
+    transition:transform .22s cubic-bezier(.2,.8,.2,1),border-color .22s;
+    display:flex;flex-direction:column;
+  }
+  .card:hover{transform:translateY(-5px);border-color:var(--accent)}
+  .card:focus-visible{outline:2px solid var(--accent-2);outline-offset:3px}
+  .thumb{
+    aspect-ratio:16/9;width:100%;object-fit:cover;display:block;
+    background:linear-gradient(135deg,var(--surface-2),var(--border));
+  }
+  .thumb-wrap{position:relative;background:linear-gradient(135deg,#1c2128,#30363d)}
+  .badge{
+    position:absolute;bottom:10px;right:10px;
+    background:rgba(0,0,0,.82);color:#fff;font-size:.72rem;font-weight:600;
+    padding:3px 8px;border-radius:5px;backdrop-filter:blur(4px);
+  }
+  .badge.verified{
+    background:rgba(63,185,80,.92);color:#0d1117;font-weight:700;
+    left:10px;right:auto;
+  }
+  .card-body{padding:16px 18px 18px;display:flex;flex-direction:column;gap:8px;flex:1}
+  .card-body h3{font-size:1rem;line-height:1.35;font-weight:650}
+  .card-body p{font-size:.85rem;color:var(--muted);flex:1}
+  .meta{display:flex;gap:10px;font-size:.76rem;color:var(--muted);align-items:center;flex-wrap:wrap}
+  .tag{background:var(--surface-2);padding:2px 9px;border-radius:5px;border:1px solid var(--border)}
+
+  .empty{text-align:center;padding:70px 0;color:var(--muted)}
+
+  footer{border-top:1px solid var(--border);padding:38px 0;margin-top:40px}
+  .foot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;font-size:.85rem;color:var(--muted)}
+  .foot a:hover{color:var(--accent)}
+  .foot-links{display:flex;gap:20px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a href="File1.html" class="logo">
+      <span class="mark">◆</span> LearnFree
+    </a>
+    <nav class="nav-links">
+      <a href="#courses">Courses</a>
+      <a href="#courses">Categories</a>
+      <a href="https://github.com/" target="_blank" rel="noopener">GitHub</a>
+      <a href="#about">About</a>
+    </nav>
+    <button class="icon-btn" id="themeBtn" aria-label="Toggle theme" style="margin-left:auto">🌙</button>
+  </div>
+</header>
+
+<main>
+  <div class="hero wrap">
+    <span class="pill"><span class="dot"></span> 100% free · open source · no ads</span>
+    <h1>Learn anything.<br><span class="grad">Without the noise.</span></h1>
+    <p class="sub">
+      Curated YouTube courses wrapped in a clean, distraction-free player.
+      No autoplay rabbit holes. No recommended-video traps. Just learning.
+    </p>
+
+    <div class="search">
+      <span class="ico">🔍</span>
+      <input id="search" type="search" placeholder="Search courses, topics, creators…" aria-label="Search courses" />
+      <kbd>/</kbd>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><b id="statCourses">0</b><span>Courses</span></div>
+      <div class="stat"><b>0</b><span>Ads. Ever.</span></div>
+      <div class="stat"><b>$0</b><span>Forever</span></div>
+    </div>
+  </div>
+
+  <section id="courses" class="wrap">
+    <div class="sec-head">
+      <h2>Browse</h2>
+      <p id="count"></p>
+    </div>
+    <div class="chips" id="chips"></div>
+    <div class="grid" id="grid"></div>
+    <div class="empty" id="empty" hidden>No courses match that search. 🤷</div>
+  </section>
+</main>
+
+<footer id="about">
+  <div class="wrap foot">
+    <p>Built with ❤️ · MIT Licensed · Videos belong to their creators</p>
+    <div class="foot-links">
+      <a href="https://github.com/" target="_blank" rel="noopener">Contribute</a>
+      <a href="#">Privacy</a>
+      <a href="#">DMCA</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ==================================================================
+   CONFIG
+================================================================== */
+const PLAYER_PAGE = "File2.html";   // ← player page filename
+
+/* ==================================================================
+   CATALOG
+================================================================== */
+const COURSES = [
+  {
+    id: "KraVJDqv7uo",
+    title: "CS50x 2025 — Introduction to Computer Science",
+    creator: "CS50",
+    desc: "The latest edition of Harvard's legendary intro to CS. Scratch, C, Python, SQL, and more.",
+    cat: "Computer Science",
+    dur: "24h",
+    level: "Beginner",
+    verified: true
+  },
+  {
+    id: "3LPJfIKxwWc",
+    title: "CS50x 2024 — Full Computer Science Course",
+    creator: "CS50",
+    desc: "Harvard's 2024 version. Algorithms, data structures, memory, and the art of programming.",
+    cat: "Computer Science",
+    dur: "24h",
+    level: "Beginner",
+    verified: true
+  },
+  {
+    id: "LfaMVlDaQ24",
+    title: "Harvard CS50 (2023) — Full University Course",
+    creator: "freeCodeCamp",
+    desc: "The complete 2023 CS50 course, released for free on freeCodeCamp's channel.",
+    cat: "Computer Science",
+    dur: "25h",
+    level: "Beginner",
+    verified: true
+  },
+  {
+    id: "8mAITcNt710",
+    title: "Harvard CS50 — Full Computer Science Course (2022)",
+    creator: "freeCodeCamp",
+    desc: "The classic 2022 edition. Perfect for anyone starting from zero.",
+    cat: "Computer Science",
+    dur: "25h",
+    level: "Beginner",
+    verified: true
+  },
+  {
+    id: "OvKCESUCWII",
+    title: "CS50P — Introduction to Programming with Python",
+    creator: "CS50",
+    desc: "Functions, variables, conditionals, loops, exceptions, file I/O, and unit tests. Python from scratch.",
+    cat: "Programming",
+    dur: "16h",
+    level: "Beginner",
+    verified: true,
+    playlist: "PLhQjrBD2T3817j24-GogXmWqO5Q5vYy0V"
+  },
+  {
+    id: "vzGllw18DkA",
+    title: "CS50W — Web Programming with Python and JavaScript",
+    creator: "CS50",
+    desc: "HTML, CSS, Git, Django, SQL, JavaScript, and building real web apps.",
+    cat: "Web Dev",
+    dur: "12h",
+    level: "Intermediate",
+    verified: true
+  },
+  {
+    id: "gR8QvFmNuLE",
+    title: "CS50 AI — Introduction to Artificial Intelligence with Python",
+    creator: "CS50",
+    desc: "Search algorithms, game engines, machine learning, neural networks, and LLMs. Full 2023 playlist available.",
+    cat: "AI & ML",
+    dur: "10h",
+    level: "Intermediate",
+    verified: true,
+    playlist: "PLhQjrBD2T381PopUTYtMSstgk-hsTGkVm"
+  },
+  {
+    id: "a7WOgMcreI0",
+    title: "CS50 Cybersecurity — Introduction to Cybersecurity",
+    creator: "CS50",
+    desc: "Securing accounts, data, systems, and software. Privacy and real-world attack prevention.",
+    cat: "Cyber Security",
+    dur: "8h",
+    level: "Beginner",
+    verified: true
+  },
+  {
+    id: "_z57x5PGF4w",
+    title: "CS50 Walkthrough — Speller (Problem Set 5)",
+    creator: "CS50",
+    desc: "Step-by-step walkthrough of the Speller problem set. Part of the CS50 2019 Walkthroughs series.",
+    cat: "Supplemental",
+    dur: "45m",
+    level: "Intermediate",
+    verified: true,
+    playlist: "PLhQjrBD2T382T4b6jjwX_qbU23E_Unwcz"
+  },
+  {
+    id: "PLACEHOLDER_SQL_ID",
+    title: "CS50 SQL — Introduction to Databases with SQL",
+    creator: "CS50",
+    desc: "Querying, relating, designing, and writing SQL. From tables to real-world databases.",
+    cat: "Databases",
+    dur: "8h",
+    level: "Beginner",
+    verified: true
+  }
+];
+
+/* ==================================================================
+   STATE + ELEMENTS
+================================================================== */
+const state = { q:"", cat:"All" };
+
+const $grid   = document.getElementById("grid");
+const $chips  = document.getElementById("chips");
+const $search = document.getElementById("search");
+const $empty  = document.getElementById("empty");
+const $count  = document.getElementById("count");
+
+/* ==================================================================
+   HELPERS
+================================================================== */
+const esc = s => String(s).replace(/[&<>"']/g, c => (
+  {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]
+));
+
+const thumbUrl = id => id
+  ? `https://i.ytimg.com/vi/${encodeURIComponent(id)}/hqdefault.jpg`
+  : "";
+
+/* ==================================================================
+   CATEGORY CHIPS
+================================================================== */
+const cats = ["All", ...new Set(COURSES.map(c => c.cat))];
+$chips.innerHTML = cats.map(c =>
+  `<button class="chip${c==="All"?" active":""}" data-cat="${esc(c)}">${esc(c)}</button>`
+).join("");
+
+$chips.addEventListener("click", e => {
+  const btn = e.target.closest(".chip");
+  if (!btn) return;
+  state.cat = btn.dataset.cat;
+  [...$chips.children].forEach(c => c.classList.toggle("active", c === btn));
+  render();
+});
+
+/* ==================================================================
+   SEARCH
+================================================================== */
+let t;
+$search.addEventListener("input", e => {
+  clearTimeout(t);
+  t = setTimeout(() => { state.q = e.target.value.trim().toLowerCase(); render(); }, 140);
+});
+
+document.addEventListener("keydown", e => {
+  if (e.key === "/" && document.activeElement !== $search) {
+    e.preventDefault(); $search.focus();
+  }
+  if (e.key === "Escape" && document.activeElement === $search) {
+    $search.value = ""; state.q = ""; render(); $search.blur();
+  }
+});
+
+/* ==================================================================
+   RENDER
+================================================================== */
+function render(){
+  const list = COURSES.filter(c => {
+    const matchCat = state.cat === "All" || c.cat === state.cat;
+    const hay = `${c.title} ${c.creator} ${c.desc} ${c.cat}`.toLowerCase();
+    return matchCat && (!state.q || hay.includes(state.q));
+  });
+
+  $grid.innerHTML = list.map(c => `
+    <article class="card" tabindex="0" role="link"
+             data-id="${esc(c.id)}" data-title="${esc(c.title)}"
+             aria-label="Open ${esc(c.title)}">
+      <div class="thumb-wrap">
+        ${c.id && !c.id.startsWith("PLACEHOLDER")
+          ? `<img class="thumb" loading="lazy" alt=""
+                  src="${thumbUrl(c.id)}"
+                  onerror="this.remove()">`
+          : ``}
+        ${c.verified ? `<span class="badge verified">✓ CS50</span>` : ``}
+        <span class="badge">${esc(c.dur)}</span>
+      </div>
+      <div class="card-body">
+        <h3>${esc(c.title)}</h3>
+        <p>${esc(c.desc)}</p>
+        <div class="meta">
+          <span class="tag">${esc(c.cat)}</span>
+          <span>${esc(c.creator)}</span>
+          <span>·</span>
+          <span>${esc(c.level)}</span>
+        </div>
+      </div>
+    </article>
+  `).join("");
+
+  $empty.hidden = list.length > 0;
+  $count.textContent = `${list.length} course${list.length === 1 ? "" : "s"}`;
+  document.getElementById("statCourses").textContent = COURSES.length;
+}
+
+/* ==================================================================
+   CLICK HANDLERS
+================================================================== */
+$grid.addEventListener("click", e => {
+  const card = e.target.closest(".card");
+  if (card) openCourse(card.dataset.id, card.dataset.title);
+});
+$grid.addEventListener("keydown", e => {
+  if (e.key !== "Enter" && e.key !== " ") return;
+  const card = e.target.closest(".card");
+  if (card) { e.preventDefault(); openCourse(card.dataset.id, card.dataset.title); }
+});
+
+function openCourse(id, title){
+  if (!id || id.startsWith("PLACEHOLDER")) {
+    alert(`"${title}" — video ID not set yet. Add it in the COURSES array.`);
+    return;
+  }
+  location.href = `${PLAYER_PAGE}?v=${encodeURIComponent(id)}`;
+}
+
+/* ==================================================================
+   THEME
+================================================================== */
+const root = document.documentElement;
+const saved = localStorage.getItem("lf-theme");
+if (saved) root.dataset.theme = saved;
+
+const $theme = document.getElementById("themeBtn");
+const syncIcon = () => $theme.textContent = root.dataset.theme === "dark" ? "🌙" : "☀️";
+syncIcon();
+
+$theme.addEventListener("click", () => {
+  root.dataset.theme = root.dataset.theme === "dark" ? "light" : "dark";
+  localStorage.setItem("lf-theme", root.dataset.theme);
+  syncIcon();
+});
+
+/* ==================================================================
+   GO
+================================================================== */
+render();
+</script>
+</body>
+</html>
