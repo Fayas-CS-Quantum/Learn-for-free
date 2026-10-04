@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Watch — LearnFree</title>
+<link rel="preconnect" href="https://i.ytimg.com" />
+
+<style>
+  :root{
+    --bg:#0d1117; --surface:#161b22; --surface-2:#1c2128;
+    --border:#30363d; --text:#e6edf3; --muted:#8b949e;
+    --accent:#3fb950; --accent-2:#58a6ff;
+    --radius:14px; --max:1400px;
+  }
+  [data-theme="light"]{
+    --bg:#ffffff; --surface:#f6f8fa; --surface-2:#eef1f4;
+    --border:#d0d7de; --text:#1f2328; --muted:#656d76;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background:var(--bg); color:var(--text);
+    font-family:system-ui,-apple-system,"Segoe UI",Inter,Roboto,sans-serif;
+    line-height:1.6; -webkit-font-smoothing:antialiased;
+    display:flex; flex-direction:column; min-height:100vh;
+  }
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:var(--max);margin:0 auto;padding:0 20px;width:100%}
+
+  header{
+    position:sticky;top:0;z-index:50;
+    background:color-mix(in srgb,var(--bg) 85%,transparent);
+    backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--border);
+  }
+  .nav{display:flex;align-items:center;gap:16px;height:64px}
+  .logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1.15rem}
+  .logo .mark{
+    width:32px;height:32px;border-radius:9px;
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    display:grid;place-items:center;font-size:1rem;color:#0d1117;
+  }
+  .back{
+    display:inline-flex;align-items:center;gap:8px;
+    background:var(--surface);border:1px solid var(--border);
+    padding:8px 14px;border-radius:10px;font-size:.88rem;color:var(--muted);
+    cursor:pointer;transition:.2s;margin-left:auto;
+  }
+  .back:hover{color:var(--text);border-color:var(--accent)}
+  .icon-btn{
+    background:var(--surface);border:1px solid var(--border);color:var(--text);
+    width:38px;height:38px;border-radius:10px;cursor:pointer;font-size:1rem;
+    display:grid;place-items:center;transition:.2s;
+  }
+  .icon-btn:hover{border-color:var(--accent);transform:translateY(-1px)}
+
+  main{flex:1;padding:32px 0 60px}
+
+  .player-layout{
+    display:grid;gap:28px;
+    grid-template-columns:minmax(0,1fr) 340px;
+  }
+  @media(max-width:1000px){
+    .player-layout{grid-template-columns:1fr}
+  }
+
+  .stage{
+    background:#000;border-radius:var(--radius);
+    overflow:hidden;position:relative;
+    aspect-ratio:16/9;width:100%;
+    border:1px solid var(--border);
+  }
+  #player, #player iframe{width:100%;height:100%;display:block}
+
+  .controls{
+    display:flex;align-items:center;gap:12px;
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:12px;padding:10px 14px;margin-top:14px;
+    flex-wrap:wrap;
+  }
+  .ctrl{
+    background:transparent;border:none;color:var(--text);
+    width:38px;height:38px;border-radius:8px;cursor:pointer;
+    display:grid;place-items:center;font-size:1rem;transition:.15s;
+  }
+  .ctrl:hover{background:var(--surface-2);color:var(--accent)}
+  .ctrl:disabled{opacity:.35;cursor:not-allowed}
+
+  .bar{
+    flex:1;height:6px;min-width:120px;
+    background:var(--surface-2);border-radius:99px;
+    position:relative;cursor:pointer;overflow:hidden;
+  }
+  .bar-fill{
+    position:absolute;left:0;top:0;bottom:0;
+    background:linear-gradient(90deg,var(--accent),var(--accent-2));
+    width:0%;border-radius:99px;transition:width .12s linear;
+  }
+  .time{
+    font-size:.82rem;color:var(--muted);
+    font-family:ui-monospace,monospace;min-width:96px;text-align:right;
+  }
+  .speed{
+    background:var(--surface-2);border:1px solid var(--border);color:var(--text);
+    padding:6px 10px;border-radius:8px;font-size:.82rem;cursor:pointer;
+  }
+
+  .info{
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:var(--radius);padding:22px;margin-top:20px;
+  }
+  .info .badge-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+  .badge{
+    background:var(--surface-2);border:1px solid var(--border);
+    padding:4px 11px;border-radius:999px;font-size:.76rem;color:var(--muted);
+  }
+  .badge.green{
+    background:rgba(63,185,80,.15);border-color:rgba(63,185,80,.5);
+    color:var(--accent);
+  }
+  .info h1{font-size:1.5rem;line-height:1.3;letter-spacing:-.02em;margin-bottom:8px}
+  .info .creator{color:var(--muted);font-size:.9rem;margin-bottom:14px}
+  .info p.desc{color:var(--muted);font-size:.94rem}
+
+  .side h2{
+    font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;
+    color:var(--muted);margin-bottom:14px;font-weight:700;
+  }
+  .mini-list{display:flex;flex-direction:column;gap:12px}
+  .mini{
+    display:flex;gap:12px;background:var(--surface);
+    border:1px solid var(--border);border-radius:11px;
+    padding:8px;cursor:pointer;transition:.18s;text-align:left;
+    width:100%;color:inherit;font:inherit;
+  }
+  .mini:hover{border-color:var(--accent);transform:translateX(3px)}
+  .mini.active{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--surface))}
+  .mini img{width:100px;aspect-ratio:16/9;object-fit:cover;border-radius:7px;flex-shrink:0;background:var(--surface-2)}
+  .mini .m-body{display:flex;flex-direction:column;gap:3px;min-width:0}
+  .mini .m-title{
+    font-size:.83rem;font-weight:600;line-height:1.3;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+    overflow:hidden;
+  }
+  .mini .m-meta{font-size:.72rem;color:var(--muted)}
+
+  .kbd-hint{
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:11px;padding:14px 16px;margin-top:18px;
+    font-size:.8rem;color:var(--muted);
+  }
+  .kbd-hint b{color:var(--text);font-weight:600}
+  .kbd-hint code{
+    background:var(--surface-2);border:1px solid var(--border);
+    padding:1px 6px;border-radius:5px;font-size:.75rem;
+    font-family:ui-monospace,monospace;color:var(--text);
+  }
+
+  .toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
+    background:var(--surface);border:1px solid var(--accent);
+    padding:12px 22px;border-radius:11px;font-size:.88rem;
+    opacity:0;transition:.3s;pointer-events:none;z-index:100;
+    box-shadow:0 12px 40px rgba(0,0,0,.35);
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a href="File1.html" class="logo">
+      <span class="mark">◆</span> LearnFree
+    </a>
+    <a href="File1.html" class="back">← Back to catalog</a>
+    <button class="icon-btn" id="themeBtn" aria-label="Toggle theme">🌙</button>
+  </div>
+</header>
+
+<main>
+  <div class="wrap player-layout">
+    <div>
+      <div class="stage"><div id="player"></div></div>
+
+      <div class="controls">
+        <button class="ctrl" id="btnBack" title="Back 10s (←)">⏪</button>
+        <button class="ctrl" id="btnPlay" title="Play/Pause (Space)">▶</button>
+        <button class="ctrl" id="btnFwd" title="Forward 10s (→)">⏩</button>
+
+        <div class="bar" id="bar" role="slider" aria-label="Seek" tabindex="0">
+          <div class="bar-fill" id="barFill"></div>
+        </div>
+        <span class="time" id="time">0:00 / 0:00</span>
+
+        <button class="ctrl" id="btnMute" title="Mute (M)">🔊</button>
+        <select class="speed" id="speed" title="Speed">
+          <option value="0.5">0.5×</option>
+          <option value="0.75">0.75×</option>
+          <option value="1" selected>1×</option>
+          <option value="1.25">1.25×</option>
+          <option value="1.5">1.5×</option>
+          <option value="2">2×</option>
+        </select>
+        <button class="ctrl" id="btnFs" title="Fullscreen (F)">⛶</button>
+      </div>
+
+      <div class="info">
+        <div class="badge-row">
+          <span class="badge green">✓ Verified</span>
+          <span class="badge" id="b-cat">—</span>
+          <span class="badge" id="b-level">—</span>
+          <span class="badge" id="b-dur">—</span>
+        </div>
+        <h1 id="c-title">Loading…</h1>
+        <div class="creator" id="c-creator">—</div>
+        <p class="desc" id="c-desc">—</p>
+      </div>
+    </div>
+
+    <aside class="side">
+      <h2>More courses</h2>
+      <div class="mini-list" id="miniList"></div>
+
+      <div class="kbd-hint">
+        <b>Shortcuts</b><br>
+        <code>Space</code> play/pause · <code>←</code>/<code>→</code> ±10s<br>
+        <code>M</code> mute · <code>F</code> fullscreen · <code>↑</code>/<code>↓</code> volume
+      </div>
+    </aside>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ==================================================================
+   CONFIG
+================================================================== */
+const CATALOG_PAGE = "File1.html";
+
+/* ==================================================================
+   CATALOG (kept in sync with File1.html)
+================================================================== */
+const COURSES = [
+  { id:"KraVJDqv7uo", title:"CS50x 2025 — Introduction to Computer Science", creator:"CS50",
+    desc:"The latest edition of Harvard's legendary intro to CS. Scratch, C, Python, SQL, and more.",
+    cat:"Computer Science", dur:"24h", level:"Beginner", verified:true },
+  { id:"3LPJfIKxwWc", title:"CS50x 2024 — Full Computer Science Course", creator:"CS50",
+    desc:"Harvard's 2024 version. Algorithms, data structures, memory, and the art of programming.",
+    cat:"Computer Science", dur:"24h", level:"Beginner", verified:true },
+  { id:"LfaMVlDaQ24", title:"Harvard CS50 (2023) — Full University Course", creator:"freeCodeCamp",
+    desc:"The complete 2023 CS50 course, released for free on freeCodeCamp's channel.",
+    cat:"Computer Science", dur:"25h", level:"Beginner", verified:true },
+  { id:"8mAITcNt710", title:"Harvard CS50 — Full Computer Science Course (2022)", creator:"freeCodeCamp",
+    desc:"The classic 2022 edition. Perfect for anyone starting from zero.",
+    cat:"Computer Science", dur:"25h", level:"Beginner", verified:true },
+  { id:"OvKCESUCWII", title:"CS50P — Introduction to Programming with Python", creator:"CS50",
+    desc:"Functions, variables, conditionals, loops, exceptions, file I/O, and unit tests. Python from scratch.",
+    cat:"Programming", dur:"16h", level:"Beginner", verified:true,
+    playlist:"PLhQjrBD2T3817j24-GogXmWqO5Q5vYy0V" },
+  { id:"vzGllw18DkA", title:"CS50W — Web Programming with Python and JavaScript", creator:"CS50",
+    desc:"HTML, CSS, Git, Django, SQL, JavaScript, and building real web apps.",
+    cat:"Web Dev", dur:"12h", level:"Intermediate", verified:true },
+  { id:"gR8QvFmNuLE", title:"CS50 AI — Introduction to Artificial Intelligence with Python", creator:"CS50",
+    desc:"Search algorithms, game engines, machine learning, neural networks, and LLMs.",
+    cat:"AI & ML", dur:"10h", level:"Intermediate", verified:true,
+    playlist:"PLhQjrBD2T381PopUTYtMSstgk-hsTGkVm" },
+  { id:"a7WOgMcreI0", title:"CS50 Cybersecurity — Introduction to Cybersecurity", creator:"CS50",
+    desc:"Securing accounts, data, systems, and software. Privacy and real-world attack prevention.",
+    cat:"Cyber Security", dur:"8h", level:"Beginner", verified:true },
+  { id:"_z57x5PGF4w", title:"CS50 Walkthrough — Speller (Problem Set 5)", creator:"CS50",
+    desc:"Step-by-step walkthrough of the Speller problem set.",
+    cat:"Supplemental", dur:"45m", level:"Intermediate", verified:true,
+    playlist:"PLhQjrBD2T382T4b6jjwX_qbU23E_Unwcz" }
+];
+
+/* ==================================================================
+   SETUP
+================================================================== */
+const params = new URLSearchParams(location.search);
+const vid    = params.get("v");
+const course = COURSES.find(c => c.id === vid);
+
+const esc = s => String(s).replace(/[&<>"']/g, c => (
+  {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]
+));
+const fmt = s => {
+  s = Math.max(0, Math.floor(s || 0));
+  const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), x = s%60;
+  return h ? `${h}:${String(m).padStart(2,"0")}:${String(x).padStart(2,"0")}`
+           : `${m}:${String(x).padStart(2,"0")}`;
+};
+
+/* --- Theme --- */
+const root = document.documentElement;
+const savedTheme = localStorage.getItem("lf-theme");
+if (savedTheme) root.dataset.theme = savedTheme;
+const $theme = document.getElementById("themeBtn");
+const syncIcon = () => $theme.textContent = root.dataset.theme === "dark" ? "🌙" : "☀️";
+syncIcon();
+$theme.addEventListener("click", () => {
+  root.dataset.theme = root.dataset.theme === "dark" ? "light" : "dark";
+  localStorage.setItem("lf-theme", root.dataset.theme);
+  syncIcon();
+});
+
+/* --- Toast --- */
+const $toast = document.getElementById("toast");
+let toastT;
+function toast(msg){
+  $toast.textContent = msg;
+  $toast.classList.add("show");
+  clearTimeout(toastT);
+  toastT = setTimeout(() => $toast.classList.remove("show"), 1800);
+}
+
+/* --- Not found --- */
+if (!vid || !course) {
+  document.getElementById("c-title").textContent = "Video not found";
+  document.getElementById("c-desc").textContent  = "Pick a course from the catalog to start watching.";
+}
+
+/* --- Populate info panel --- */
+if (course) {
+  document.title = `${course.title} — LearnFree`;
+  document.getElementById("c-title").textContent   = course.title;
+  document.getElementById("c-creator").textContent = `${course.creator} · ${course.level}`;
+  document.getElementById("c-desc").textContent    = course.desc;
+  document.getElementById("b-cat").textContent     = course.cat;
+  document.getElementById("b-level").textContent   = course.level;
+  document.getElementById("b-dur").textContent     = course.dur;
+}
+
+/* --- Sidebar mini list --- */
+const $miniList = document.getElementById("miniList");
+const others = COURSES.filter(c => c.id !== vid).slice(0, 6);
+$miniList.innerHTML = others.map(c => `
+  <button class="mini" data-id="${esc(c.id)}" aria-label="Watch ${esc(c.title)}">
+    <img loading="lazy" alt="" src="https://i.ytimg.com/vi/${esc(c.id)}/mqdefault.jpg"
+         onerror="this.style.visibility='hidden'">
+    <div class="m-body">
+      <span class="m-title">${esc(c.title)}</span>
+      <span class="m-meta">${esc(c.creator)} · ${esc(c.dur)}</span>
+    </div>
+  </button>
+`).join("");
+
+$miniList.addEventListener("click", e => {
+  const btn = e.target.closest(".mini");
+  if (btn) location.href = `?v=${encodeURIComponent(btn.dataset.id)}`;
+});
+
+/* ==================================================================
+   YOUTUBE IFRAME API
+================================================================== */
+let player;
+let saveT;
+
+function onYouTubeIframeAPIReady(){
+  if (!vid) return;
+
+  player = new YT.Player("player", {
+    videoId: vid,
+    host: "https://www.youtube-nocookie.com",
+    playerVars: {
+      modestbranding: 1,
+      rel: 0,
+      iv_load_policy: 3,
+      playsinline: 1,
+      controls: 0,
+      disablekb: 1,
+      fs: 0,
+      origin: location.origin
+    },
+    events: {
+      onReady: onReady,
+      onStateChange: onState
+    }
+  });
+}
+window.onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
+
+const ytScript = document.createElement("script");
+ytScript.src = "https://www.youtube.com/iframe_api";
+document.head.appendChild(ytScript);
+
+function onReady(){
+  const key = `lf-pos-${vid}`;
+  const savedPos = parseFloat(localStorage.getItem(key) || "0");
+  if (savedPos > 5) {
+    player.seekTo(savedPos, true);
+    toast(`Resumed at ${fmt(savedPos)}`);
+  }
+
+  setInterval(() => {
+    if (!player || !player.getCurrentTime) return;
+    updateProgressUI();
+    if (player.getPlayerState && player.getPlayerState() === 1) persist();
+  }, 500);
+}
+
+function onState(e){
+  const playing = e.data === 1;
+  document.getElementById("btnPlay").textContent = playing ? "❚❚" : "▶";
+}
+
+function persist(){
+  clearTimeout(saveT);
+  saveT = setTimeout(() => {
+    try {
+      const t = player.getCurrentTime();
+      if (t > 2) localStorage.setItem(`lf-pos-${vid}`, String(t));
+    } catch(_) {}
+  }, 300);
+}
+
+/* ==================================================================
+   CUSTOM CONTROLS
+================================================================== */
+const $play  = document.getElementById("btnPlay");
+const $back  = document.getElementById("btnBack");
+const $fwd   = document.getElementById("btnFwd");
+const $mute  = document.getElementById("btnMute");
+const $fs    = document.getElementById("btnFs");
+const $bar   = document.getElementById("bar");
+const $fill  = document.getElementById("barFill");
+const $time  = document.getElementById("time");
+const $speed = document.getElementById("speed");
+
+function togglePlay(){
+  if (!player || !player.getPlayerState) return;
+  const s = player.getPlayerState();
+  if (s === 1) player.pauseVideo(); else player.playVideo();
+}
+function seekBy(d){
+  if (!player || !player.getCurrentTime) return;
+  player.seekTo(Math.max(0, player.getCurrentTime() + d), true);
+}
+function updateProgressUI(){
+  if (!player || !player.getCurrentTime) return;
+  const cur = player.getCurrentTime() || 0;
+  const tot = player.getDuration() || 0;
+  const pct = tot ? (cur / tot) * 100 : 0;
+  $fill.style.width = pct + "%";
+  $time.textContent = `${fmt(cur)} / ${fmt(tot)}`;
+}
+
+$play.addEventListener("click", togglePlay);
+$back.addEventListener("click", () => seekBy(-10));
+$fwd.addEventListener("click", () => seekBy(10));
+
+$mute.addEventListener("click", () => {
+  if (!player || !player.isMuted) return;
+  if (player.isMuted()) { player.unMute(); $mute.textContent = "🔊"; }
+  else                  { player.mute();   $mute.textContent = "🔇"; }
+});
+
+$fs.addEventListener("click", () => {
+  const stage = document.querySelector(".stage");
+  if (!document.fullscreenElement) stage.requestFullscreen?.();
+  else document.exitFullscreen?.();
+});
+
+$speed.addEventListener("change", () => {
+  if (player && player.setPlaybackRate) player.setPlaybackRate(parseFloat($speed.value));
+});
+
+function barSeek(e){
+  if (!player || !player.getDuration) return;
+  const r = $bar.getBoundingClientRect();
+  const x = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
+  const pct = Math.min(1, Math.max(0, x / r.width));
+  player.seekTo(pct * player.getDuration(), true);
+}
+$bar.addEventListener("click", barSeek);
+
+/* ==================================================================
+   KEYBOARD SHORTCUTS
+================================================================== */
+document.addEventListener("keydown", e => {
+  const tag = (e.target.tagName || "").toLowerCase();
+  if (tag === "input" || tag === "textarea" || tag === "select") return;
+
+  switch(e.key){
+    case " ":
+      e.preventDefault(); togglePlay(); break;
+    case "ArrowLeft":
+      e.preventDefault(); seekBy(-10); break;
+    case "ArrowRight":
+      e.preventDefault(); seekBy(10); break;
+    case "ArrowUp":
+      e.preventDefault();
+      if (player && player.setVolume) player.setVolume(Math.min(100, player.getVolume() + 10));
+      break;
+    case "ArrowDown":
+      e.preventDefault();
+      if (player && player.setVolume) player.setVolume(Math.max(0, player.getVolume() - 10));
+      break;
+    case "m": case "M":
+      $mute.click(); break;
+    case "f": case "F":
+      $fs.click(); break;
+  }
+});
+
+/* --- Save on leave --- */
+window.addEventListener("beforeunload", () => {
+  try {
+    if (player && player.getCurrentTime) {
+      const t = player.getCurrentTime();
+      if (t > 2) localStorage.setItem(`lf-pos-${vid}`, String(t));
+    }
+  } catch(_) {}
+});
+</script>
+</body>
+</html>
